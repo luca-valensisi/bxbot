@@ -44,6 +44,13 @@
   <properties>
     <revision>2.2.2-SNAPSHOT</revision>
 
+    <!--
+      Drives maven.compiler.release via spring-boot-starter-parent, which otherwise defaults
+      java.version to 17. Without this, the compiler emits Java 17 bytecode regardless of any
+      source/target settings, because the javac release flag supersedes them.
+    -->
+    <java.version>21</java.version>
+
     <!-- Should be same as dependency used by spring-boot-starter.version -->
     <spring-core.version>6.1.14</spring-core.version>
 
@@ -362,8 +369,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
-            <source>21</source>
-            <target>21</target>
+            <!-- Java level comes from the java.version property -> maven.compiler.release. -->
             <compilerArgs>
               <arg>-Xlint:-options</arg>
             </compilerArgs>
