@@ -44,3 +44,32 @@ strategies:
     configItems:
       counter-currency-buy-order-amount: 20
       minimum-percentage-gain: 2
+
+  # Moving Average Channel Breakout Strategy
+  # Combines EMA crossover (trend filter) with Donchian channel breakout (entry signal).
+  # Set test-mode: true for dry-run logging without real orders.
+  - id: ma-channel-breakout-strategy
+
+    name: Moving Average Channel Breakout
+
+    description: >
+      Uses EMA crossover as a trend filter and Donchian channel breakout for entry/exit signals.
+      A BUY is triggered when the short EMA is above the long EMA and price breaks above the upper
+      channel. A SELL (or stop-loss) closes the position when trend reverses or price drops too far.
+      Enable test-mode to log signals without placing real orders.
+
+    beanName: movingAverageChannelBreakout
+
+    configItems:
+      # Amount of counter currency (e.g. USD) to spend on each buy order
+      counter-currency-buy-order-amount: 20
+      # Short EMA period (must be less than long-ema-period)
+      short-ema-period: 10
+      # Long EMA period
+      long-ema-period: 20
+      # Donchian channel lookback period
+      channel-period: 20
+      # Stop-loss percentage below the buy entry price (e.g. 2.0 = 2%)
+      stop-loss-percentage: 2.0
+      # Set to true for dry-run mode: signals are logged but no real orders are placed
+      test-mode: true

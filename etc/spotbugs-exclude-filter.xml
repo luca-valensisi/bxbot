@@ -159,6 +159,11 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 
+    <Match>
+        <Class name="com.gazbert.bxbot.strategies.MovingAverageChannelBreakoutStrategy"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
     <!-- Ignore bxbot-core warnings -->
     <Match>
         <Class name="com.gazbert.bxbot.core.config.exchange.NetworkConfigImpl"/>
