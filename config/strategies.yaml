@@ -73,3 +73,54 @@ strategies:
       stop-loss-percentage: 2.0
       # Set to true for dry-run mode: signals are logged but no real orders are placed
       test-mode: true
+
+  # Mean Reversion Strategy (RSI + Bollinger Bands)
+  # Long-only: buys oversold dips onto the lower Bollinger band while the market is ranging,
+  # sells back at the moving average. Sizing and stop-loss are driven by ATR.
+  # Set test-mode: true for dry-run logging without real orders.
+  - id: mean-reversion-rsi-bollinger-strategy
+
+    name: Mean Reversion RSI Bollinger
+
+    description: >
+      Mean reversion strategy combining Bollinger Bands and the RSI, gated by an ADX regime filter.
+      A BUY is triggered when the market is NOT trending (ADX below the threshold), the last close
+      is at or below the lower Bollinger band, and the RSI is oversold. The position is closed when
+      price reverts to the middle band, the RSI turns neutral, the ATR stop-loss is hit, or the
+      position has been held for too many candles. A max drawdown kill switch halts trading.
+      BX-bot is spot only, so short setups are logged but never traded.
+      Enable test-mode to log signals without placing real orders.
+
+    beanName: meanReversionRsiBollinger
+
+    configItems:
+      # Length of each aggregated candle, in seconds. Candles are built from the ticker, one sample
+      # per trade cycle, so this should be a multiple of engine.yaml tradeCycleInterval.
+      # 300 = 5 minute candles. Warm-up is 29 candles with the periods below.
+      candle-seconds: 300
+      # Bollinger Bands: moving average length and standard deviation multiplier
+      bollinger-period: 20
+      bollinger-std-dev-multiplier: 2.0
+      # RSI period and thresholds. Must satisfy oversold < exit < overbought.
+      rsi-period: 14
+      rsi-oversold-threshold: 30
+      rsi-overbought-threshold: 70
+      rsi-exit-threshold: 50
+      # ATR period and the stop-loss distance as a multiple of the ATR
+      atr-period: 14
+      atr-stop-loss-multiplier: 2.0
+      # ADX regime filter: no new entries while ADX is at or above this threshold (trending market)
+      adx-period: 14
+      adx-trend-threshold: 25
+      # Time exit: close the position if it has not reverted within this many candles
+      max-holding-candles: 24
+      # Simulated starting capital, in counter currency, used for sizing and the drawdown tracker
+      starting-capital: 1000
+      # Percentage of equity risked per trade if the stop-loss is hit
+      risk-per-trade-percentage: 1.0
+      # Hard cap on the counter currency spent per order
+      counter-currency-buy-order-amount: 20
+      # Trading halts when equity falls this far below its peak
+      max-drawdown-percentage: 15.0
+      # Set to true for dry-run mode: signals are logged but no real orders are placed
+      test-mode: true
