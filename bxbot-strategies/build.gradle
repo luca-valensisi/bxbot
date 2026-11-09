@@ -15,6 +15,9 @@ dependencies {
   testImplementation libraries.powermock_junit
   testImplementation libraries.powermock_api_easymock
   testImplementation libraries.easymock
+
+  // JUnit 4 still as Powermock does not play with Junit 5; also brings JUnit 4.13 (assertThrows)
+  testImplementation libraries.junit_vintage_engine
 }
 
 jacocoTestCoverageVerification {
