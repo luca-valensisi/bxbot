@@ -6,21 +6,27 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
+      # Secrets cannot be used directly in step conditions, so expose it here.
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 21
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v4
         with:
+          # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
           java-version: '21'
-          distribution: 'adopt'
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
-      - name: Gradle build & SonarCloud analysis
-        run: ./gradlew build integrationTests jacocoTestReport sonarqube
+      - name: Set up Gradle (validates the wrapper and caches dependencies)
+        uses: gradle/actions/setup-gradle@v4
+      - name: Gradle build
+        run: ./gradlew build integrationTests jacocoTestReport
+      - name: SonarCloud analysis
+        if: env.SONAR_TOKEN != ''
+        run: ./gradlew sonarqube
         env:
           # Needed to get some information about the pull request, if any
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
