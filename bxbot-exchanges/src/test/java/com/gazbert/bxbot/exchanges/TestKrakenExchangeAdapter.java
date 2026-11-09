@@ -1065,9 +1065,8 @@ public class TestKrakenExchangeAdapter extends AbstractExchangeAdapterTest {
   // --------------------------------------------------------------------------
 
   @Test
-  public void testGettingImplNameIsAsExpected() {
-    PowerMock.replayAll();
-    final ExchangeAdapter exchangeAdapter = new KrakenExchangeAdapter();
+  public void testGettingImplNameIsAsExpected() throws Exception {
+    final KrakenExchangeAdapter exchangeAdapter = createInitialisedMockedAdapter();
     exchangeAdapter.init(exchangeConfig);
     assertEquals("Kraken API v1", exchangeAdapter.getImplName());
     PowerMock.verifyAll();
@@ -1075,9 +1074,7 @@ public class TestKrakenExchangeAdapter extends AbstractExchangeAdapterTest {
 
   @Test
   public void testGettingExchangeSellingFeeIsAsExpected() throws Exception {
-    PowerMock.replayAll();
-
-    final ExchangeAdapter exchangeAdapter = new KrakenExchangeAdapter();
+    final KrakenExchangeAdapter exchangeAdapter = createInitialisedMockedAdapter();
     exchangeAdapter.init(exchangeConfig);
 
     final BigDecimal sellPercentageFee =
@@ -1089,9 +1086,7 @@ public class TestKrakenExchangeAdapter extends AbstractExchangeAdapterTest {
 
   @Test
   public void testGettingExchangeBuyingFeeIsAsExpected() throws Exception {
-    PowerMock.replayAll();
-
-    final ExchangeAdapter exchangeAdapter = new KrakenExchangeAdapter();
+    final KrakenExchangeAdapter exchangeAdapter = createInitialisedMockedAdapter();
     exchangeAdapter.init(exchangeConfig);
 
     final BigDecimal buyPercentageFee =
@@ -1103,22 +1098,18 @@ public class TestKrakenExchangeAdapter extends AbstractExchangeAdapterTest {
 
   @Test
   public void testGettingMinOrderVolumeIfAvailable() throws Exception {
-    PowerMock.replayAll();
-
-    final ExchangeAdapter exchangeAdapter = new KrakenExchangeAdapter();
+    final KrakenExchangeAdapter exchangeAdapter = createInitialisedMockedAdapter();
     exchangeAdapter.init(exchangeConfig);
 
     final BigDecimal minimumOrderVolume = exchangeAdapter.getMinimumOrderVolume("XBTUSD");
-    assertEquals(0, minimumOrderVolume.compareTo(new BigDecimal("0.00005")));
+    assertEquals(0, minimumOrderVolume.compareTo(new BigDecimal("0.001")));
 
     PowerMock.verifyAll();
   }
 
   @Test
   public void testGettingMinOrderVolumeIfNotAvailable() throws Exception {
-    PowerMock.replayAll();
-
-    final ExchangeAdapter exchangeAdapter = new KrakenExchangeAdapter();
+    final KrakenExchangeAdapter exchangeAdapter = createInitialisedMockedAdapter();
     exchangeAdapter.init(exchangeConfig);
 
     final BigDecimal minimumOrderVolume = exchangeAdapter.getMinimumOrderVolume("XBTGBP.d");
@@ -1480,6 +1471,19 @@ public class TestKrakenExchangeAdapter extends AbstractExchangeAdapterTest {
     exchangeAdapter.createOrder(MARKET_ID, OrderType.SELL, SELL_ORDER_QUANTITY, SELL_ORDER_PRICE);
 
     PowerMock.verifyAll();
+  }
+
+  /**
+   * Creates a partial mock adapter whose AssetPairs call returns the local fixture, and puts all
+   * mocks in replay state. Callers must still call {@code init(exchangeConfig)}.
+   */
+  private KrakenExchangeAdapter createInitialisedMockedAdapter() throws Exception {
+    final KrakenExchangeAdapter exchangeAdapter =
+        PowerMock.createPartialMockAndInvokeDefaultConstructor(
+            KrakenExchangeAdapter.class, MOCKED_SEND_PUBLIC_REQUEST_TO_EXCHANGE_METHOD);
+    mockAssetPairsPublicRequest(exchangeAdapter);
+    PowerMock.replayAll();
+    return exchangeAdapter;
   }
 
   private void mockAssetPairsPublicRequest(Object exchangeAdapter) throws Exception {

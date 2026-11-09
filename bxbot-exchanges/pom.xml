@@ -14,6 +14,14 @@
     <artifactId>bxbot-parent</artifactId>
     <version>${revision}</version>
   </parent>
+  <properties>
+    <!--
+      Empty default so that @{argLine} in the surefire config below is resolvable by IDEs (IntelliJ
+      drops the whole argLine, including the add-opens options PowerMock needs, when it can't resolve it).
+      In a Maven build jacoco:prepare-agent overrides this with the JaCoCo agent option.
+    -->
+    <argLine></argLine>
+  </properties>
   <profiles>
     <profile>
       <id>unit</id>
@@ -147,7 +155,7 @@
           -->
           <argLine>
             <!-- See: https://stackoverflow.com/questions/23190107/cannot-use-jacoco-jvm-args-and-surefire-jvm-args-together-in-maven -->
-            ${argLine}
+            @{argLine}
             --add-opens java.base/java.util=ALL-UNNAMED
             --add-opens java.base/java.util.stream=ALL-UNNAMED
             --add-opens java.base/java.lang=ALL-UNNAMED
